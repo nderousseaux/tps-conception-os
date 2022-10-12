@@ -130,6 +130,18 @@ ideintr(void)
   release(&idelock);
 }
 
+
+void afficher_compte(){
+  struct buf *b;
+  int i = 0;
+  for(b = idequeue; b != 0; b = b->qnext){
+    i++;
+  }
+  if(i > 1)
+    cprintf("Nombre de buffers dans la file : %d\n", i);
+}
+
+
 //PAGEBREAK!
 // Sync buf with disk.
 // If B_DIRTY is set, write buf to disk, clear B_DIRTY, set B_VALID.
@@ -153,6 +165,9 @@ iderw(struct buf *b)
   for(pp=&idequeue; *pp; pp=&(*pp)->qnext)  //DOC:insert-queue
     ;
   *pp = b;
+
+  //On affiche le nombre de buffers dans la file
+  afficher_compte();  
 
   // Start disk if necessary.
   if(idequeue == b)
