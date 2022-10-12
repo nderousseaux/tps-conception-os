@@ -385,6 +385,57 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
   return 0;
 }
 
+//Pour cela, on propose de rédiger la fonction void printpgdir (pde_t *pgdir) dans le fichier vm.c, 
+//en utilisant les macros du fichier mmu.h et memlayout.h (NPDENTRIES, NPTENTRIES, PTE_*, PTE_ADDR et P2V) 
+//pour faciliter l’accès aux adresses et aux flags de la table de page. 
+//Vous appellerez cette fonction à la fin de exec. 
+// On notera sur l’exemple qu’on restreint l’affichage aux adresses virtuelles inférieures à 2 Go (KERNBASE),
+// puisque les adresses au-delà correspondent aux adresses utilisées par le noyau.
+
+void printpgdir(pde_t *pgdir) {
+  int num_page = 0;
+  int i;
+  int j;
+
+  //Pour chaque page
+  for (i = 0; i < NPDENTRIES; i++) {
+    //Si la page est présente
+    if (pgdir[i] & PTE_P) {
+      //On passe au niveau suivant
+      pte_t *pte = (pte_t *) P2V(PTE_ADDR(pgdir[i]));
+      for (j = 0; j<NPTENTRIES; j++){
+        //Si la page est présente
+        if (
+          (pte[j] & PTE_P) &&
+          (PTE_ADDR(pte[j]) < KERNBASE)
+        ){
+          //On affiche les informations
+          cprintf("[%d] -> 0x%x ", num_page, PTE_ADDR(pte[j]));
+
+          //On affiche les flags
+          //le bit w
+          if(pte[j] & PTE_W) {
+            cprintf("W ");
+          } else {
+            cprintf("- ");
+          }
+
+          //le bit u
+          if(pte[j] & PTE_U) {
+            cprintf("U");
+          } else {
+            cprintf("S");
+          }
+          cprintf("\n");
+          num_page++;
+
+        }
+     }
+    }
+  }
+}
+
+
 //PAGEBREAK!
 // Blank page.
 //PAGEBREAK!
