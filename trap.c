@@ -32,10 +32,40 @@ idtinit(void)
   lidt(idt, sizeof(idt));
 }
 
+int *trap_count[256];
+int nb_trap = 0;
+char stop = 0;
+
+void
+cnt_trap(int trapno)
+{
+  if(nb_trap<1000){
+    nb_trap++;
+    trap_count[trapno]++;
+  }
+  else if(stop == 0){
+    int i = 0;
+    for(i = 0; i < 256; i++)
+      cprintf("int %d : %d \n", i, trap_count[i]);
+    stop = 1;
+  }
+
+}
+
+
 //PAGEBREAK: 41
 void
 trap(struct trapframe *tf)
 {
+  //On recupere le numero de l'interruption et le niveau de privilege
+  int trapno = tf->trapno;
+  if(trapno != 32){
+    int priv = tf->cs & 3;
+    cprintf("trapno : %d, priv : %d\n", trapno, priv);
+  }
+
+
+  cnt_trap(tf->trapno);
   if(tf->trapno == T_SYSCALL){
     if(myproc()->killed)
       exit();
