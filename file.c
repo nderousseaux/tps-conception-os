@@ -10,6 +10,7 @@
 #include "sleeplock.h"
 #include "file.h"
 #include "fcntl.h"
+#include "stat.h"
 
 struct devsw devsw[NDEV];
 struct {
@@ -157,9 +158,9 @@ filewrite(struct file *f, char *addr, int n)
 }
 
 int
-filelseek(struct file *f, int o, int s)
+filelseek(struct file *f, uint o, int s)
 {
-  int offset = 0;
+  uint offset = 0;
 
   if(f->readable == 0 || f->type != FD_INODE)
     return -1;
@@ -181,10 +182,17 @@ filelseek(struct file *f, int o, int s)
       iunlock(f->ip);
       return -1;
   }
-
-  if(offset < 0 || offset > f->ip->size){
+  if(offset < 0){
     iunlock(f->ip);
     return -1;
+  }
+
+  //Si ce n'est pas un fichier spécial, on ne se préocupe de sa taille
+  if(f->ip->type != T_DEV){
+    if(offset > f->ip->size){
+      iunlock(f->ip);
+      return -1;
+    }
   }
 
   f->off = offset;

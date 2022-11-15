@@ -10,7 +10,9 @@
             "name": "Launch QEMU debug",
             "target": "localhost:25501",
             "remote": true,
+            "executable": "${workspaceRoot}/kernel",
             "cwd": "${workspaceRoot}", 
+            "gdbpath": "/usr/local/bin/gdb",
             "preLaunchTask": "build debug",
             "postDebugTask": "end", //Close puis clean
         }
