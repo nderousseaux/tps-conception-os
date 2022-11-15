@@ -385,6 +385,29 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
   return 0;
 }
 
+//Cette fonction réalise le travail effectif du pilote pour ce mineur.
+// Elle récupère l’offset et le nombre d’octets, et vérifie pour chaque page avec la fonction walkpgdir
+// que l’entrée est bien présente dans la table des pages.
+// Si c’est le cas, son contenu est recopié à partir de l’adresse de destination. 
+// Sinon, l’adresse de destination est initialisée avec des zéros.
+int kmemread (char *dst, uint off, int n){
+  uint va0, pa0;
+  pte_t *pte;
+
+  int i;
+  for (i = 0; i < n; i += PGSIZE) {
+    va0 = (uint)PGROUNDDOWN(off + i);
+    pte = walkpgdir(myproc()->pgdir, (char*)va0, 0);
+    if(pte == 0 || (*pte & PTE_P) == 0)
+      memset(dst + i, 0, PGSIZE);
+    else {
+      pa0 = PTE_ADDR(*pte);
+      memmove(dst + i, (char*)P2V(pa0) + (off + i - va0), PGSIZE);
+    }
+  }
+  return 0;
+}
+
 //PAGEBREAK!
 // Blank page.
 //PAGEBREAK!

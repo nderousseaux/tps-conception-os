@@ -33,7 +33,7 @@ void            fileinit(void);
 int             fileread(struct file*, char*, int n);
 int             filestat(struct file*, struct stat*);
 int             filewrite(struct file*, char*, int n);
-int             filelseek(struct file*, int o, int s);
+int             filelseek(struct file*, uint o, int s);
 
 // fs.c
 void            readsb(int dev, struct superblock *sb);
@@ -186,6 +186,12 @@ void            switchuvm(struct proc*);
 void            switchkvm(void);
 int             copyout(pde_t*, uint, void*, uint);
 void            clearpteu(pde_t *pgdir, char *uva);
+int             kmemread (char *dst, uint off, int n);
+
+//drvmem.c
+void            drvmeminit(void);
+int             drvmemread(struct inode *ip, char *dst, uint off, int n);
+int             drvmemwrite(struct inode *ip, char *dst, uint off, int n);
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))
