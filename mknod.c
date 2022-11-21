@@ -14,10 +14,10 @@ main(int argc, char *argv[])
 
   if(argc != 4){
     printf(3, "Usage: mknod_prog <file> <major> <minor>");
-    exit();
+    exit(0);
   }
   
   mknod_prog(argv[1], atoi(argv[2]), atoi(argv[3]));
-  exit();
+  exit(0);
 
 }

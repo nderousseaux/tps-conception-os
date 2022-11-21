@@ -18,8 +18,8 @@ main(int argc, char *argv[])
 {
   if(argc != 3){
     printf(2, "mv: incorrect number of arguments (2 require)\n");
-    exit();
+    exit(0);
   }
   mv(argv[1], argv[2]);
-  exit();
+  exit(0);
 }

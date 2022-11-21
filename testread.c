@@ -21,7 +21,7 @@ hex2off(char *h)
     else
     {
       printf(2, "illegal hex digit\n") ;
-      exit () ;
+      exit (0) ;
     }
     off = (off << 4) + d;
   }
@@ -38,7 +38,7 @@ main(int argc, char *argv[])
 
   if(argc != 4){
     printf(2, "Usage: testread dev off n\n");
-    exit();
+    exit(0);
   }
 
   off = hex2off (argv [2]);
@@ -51,21 +51,21 @@ main(int argc, char *argv[])
 
   if ((fd = open (argv[1], O_RDONLY)) == -1) {
     printf(2, "cannot open %d\n", argv[1]);
-    exit();
+    exit(0);
   }
   if (lseek(fd, off, SEEK_SET) == -1) {
     printf(2, "cannot lseek to %d\n", off);
-    exit();
+    exit(0);
   }
   nr = read(fd, buf, n);
   printf (1, "read %d bytes\n", nr) ;
   if (nr == -1) {
     printf(2, "cannot read %d bytes", n);
-    exit();
+    exit(0);
   }
   if (close(fd) == -1) {
     printf(2, "cannot close %s\n", argv[1]);
-    exit();
+    exit(0);
   }
 
   for (i = 0 ; i < nr ; i++)
@@ -76,5 +76,5 @@ main(int argc, char *argv[])
   }
   printf (1,"\n") ;
 
-  exit();
+  exit(0);
 }

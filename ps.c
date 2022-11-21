@@ -32,7 +32,7 @@ hex2off(char *h)
     else
     {
       printf(2, "illegal hex digit\n") ;
-      exit () ;
+      exit (0) ;
     }
     off = (off << 4) + d;
   }
@@ -57,28 +57,28 @@ main(int argc, char *argv[])
 
   if(argc != 3){
     printf(2, "Usage: ps kmem proc-addr\n");
-    exit();
+    exit(0);
   }
 
   off = hex2off (argv [2]) ;
   printf (1, "off=%x\n", off);
   if ((fd = open (argv[1], O_RDONLY)) == -1) {
     printf(2, "cannot open %d\n", argv[1]);
-    exit();
+    exit(0);
   }
   if (lseek(fd, off, SEEK_SET) == -1) {
     printf(2, "cannot lseek to %d\n", off);
-    exit();
+    exit(0);
   }
   i = read(fd, &ptable, sizeof ptable);
   printf (1, "read %d bytes\n", i) ;
   if (i == -1) {
     printf(2, "cannot read %d procs", NPROC);
-    exit();
+    exit(0);
   }
   if (close(fd) == -1) {
     printf(2, "cannot close %s\n", argv[1]);
-    exit();
+    exit(0);
   }
 
   unsigned char *p = (unsigned char *) &ptable.proc;
@@ -99,5 +99,5 @@ main(int argc, char *argv[])
 		ptable.proc [i].name) ;
   }
 
-  exit();
+  exit(0);
 }

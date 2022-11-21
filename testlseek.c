@@ -29,7 +29,7 @@ testlseek(char* filename, int o, int n)
       o,
 	    (ref == SEEK_SET) ? "SEEK_SET" : "SEEK_END"
     );
-    exit();
+    exit(0);
   }
   printf(2, "testlseek: %s fd=%d o=%d n=%d ref=%d\n", filename,fd,o,n,ref);
 
@@ -42,7 +42,7 @@ testlseek(char* filename, int o, int n)
   //On ferme le fichier
   if (close(fd) == -1) {
     printf(2, "testlseek: cannot close %s\n", filename);
-    exit();
+    exit(0);
   }
 
   lseek(0, 0, 0);
@@ -54,8 +54,8 @@ main(int argc, char *argv[])
   if(argc != 4)
   {
     printf(2, "testlseek: incorrect number of arguments (3 require)\n");
-    exit();
+    exit(0);
   }
   testlseek(argv[1], atoi(argv[2]), atoi(argv[3]));
-  exit();
+  exit(0);
 }
