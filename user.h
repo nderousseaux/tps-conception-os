@@ -37,3 +37,7 @@ void* memset(void*, int, uint);
 void* malloc(uint);
 void free(void*);
 int atoi(const char*);
+int getpid(void);
+int getppid(void);
+int getpid2(void);
+int getppid2(void);

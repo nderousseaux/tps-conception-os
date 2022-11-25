@@ -10,7 +10,7 @@
 int
 exec(char *path, char **argv)
 {
-  char *s, *last;
+  char *s, *last, *oldvsc, *newvsc;
   int i, off;
   uint argc, sz, sp, ustack[3+MAXARG+1];
   struct elfhdr elf;
@@ -96,6 +96,15 @@ exec(char *path, char **argv)
   // Commit to the user image.
   oldpgdir = curproc->pgdir;
   curproc->pgdir = pgdir;
+
+   // Si la page VSC existe, on la recopie dans le nouveau processus
+  if ((oldvsc=vsc_get(oldpgdir, 0)) != 0) {
+      if ((newvsc = vsc_alloc(curproc->pgdir, 0)) == 0)
+          goto bad;
+
+    memmove(newvsc, oldvsc, PGSIZE); 
+  }
+  
   curproc->sz = sz;
   curproc->tf->eip = elf.entry;  // main
   curproc->tf->esp = sp;

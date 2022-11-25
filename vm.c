@@ -385,6 +385,40 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
   return 0;
 }
 
+// Alloue une page vierge et l'installe à l'adresse VSCADDR dans la table des pages indiqués par pgdir
+// Retourne l'addresse utilisable pour mettre à jour la page, 0 en cas d'erreur
+void *vsc_alloc(pde_t *pgdir, int n)
+{ 
+  (void) n;
+  // Alloue une page vierge
+  char *mem = kalloc();
+
+  //On l'installe à l'adresse VSCADDR dans la table des pages indiqués par pgdir
+  if(mappages(pgdir, (char*)VSCADDR, PGSIZE, V2P(mem), PTE_W|PTE_U) < 0){
+    panic("erreur\n");
+    kfree(mem);
+    return 0;
+  }
+
+  // On la retourne, convertie en addresse utilisable par le noyau pour mettre à jour la page
+  return mem;
+}
+
+// Renvoie l'adresse virtuelle du début de la page utilisable par le noyau
+// 0 si la page n'existe pas
+void *vsc_get(pde_t *pgdir, int n)
+{
+  (void) n;
+  pte_t *pte = walkpgdir(pgdir, (char*)VSCADDR, 0);
+  // Renvoie 0 si la page n'existe pas
+  if(pte == 0 || (*pte & PTE_P) == 0)
+    return 0;
+  
+  //Renvoie l'adresse virtuelle utilisable par le noyau pour mettre à jour la page
+  return (void*)P2V(PTE_ADDR(*pte));
+}
+  
+  
 //PAGEBREAK!
 // Blank page.
 //PAGEBREAK!

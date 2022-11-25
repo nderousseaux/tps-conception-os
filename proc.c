@@ -183,6 +183,7 @@ fork(void)
   int i, pid;
   struct proc *np;
   struct proc *curproc = myproc();
+  char *vsc;
 
   // Allocate process.
   if((np = allocproc()) == 0){
@@ -196,6 +197,18 @@ fork(void)
     np->state = UNUSED;
     return -1;
   }
+
+  // On alloue une nouvelle page VSC pour le processus fils
+  if((vsc = kalloc()) == 0){
+    kfree(np->kstack);
+    np->kstack = 0;
+    np->state = UNUSED;
+    return -1;
+  }
+  //On met le pid fils et père dans la page VSC
+  memmove(vsc, &np->pid, 4);
+  memmove(vsc+4, &curproc->pid, 4);
+
   np->sz = curproc->sz;
   np->parent = curproc;
   *np->tf = *curproc->tf;
@@ -230,6 +243,7 @@ exit(void)
   struct proc *curproc = myproc();
   struct proc *p;
   int fd;
+  char *vsc;
 
   if(curproc == initproc)
     panic("init exiting");
@@ -256,6 +270,12 @@ exit(void)
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     if(p->parent == curproc){
       p->parent = initproc;
+
+      // On change le pid du père dans la page VSC
+      if((vsc = vsc_get(p->pgdir, 0)) != 0){
+        memmove(vsc+4, &initproc->pid, 4);
+      }
+
       if(p->state == ZOMBIE)
         wakeup1(initproc);
     }
