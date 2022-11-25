@@ -199,7 +199,7 @@ fork(void)
   }
 
   // On alloue une nouvelle page VSC pour le processus fils
-  if((vsc = kalloc()) == 0){
+  if((vsc = vsc_alloc(np->pgdir, 0)) == 0){
     kfree(np->kstack);
     np->kstack = 0;
     np->state = UNUSED;
